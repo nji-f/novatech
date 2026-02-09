@@ -9,7 +9,7 @@ export default async function handler(req, res) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "gpt-3.5-turbo", // Sesuaikan model yang tersedia di z.ai
+      model: "glm-4.6", // Sesuaikan model yang tersedia di z.ai
       messages: [{ role: "user", content: prompt }]
     })
   });
