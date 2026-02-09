@@ -1,22 +1,134 @@
 <!DOCTYPE html>
-<html>
-<body>
-  <h1>AI Assistant</h1>
-  <input type="text" id="input" placeholder="Tanya sesuatu...">
-  <button onclick="askAI()">Kirim</button>
-  <p id="response"></p>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaTech AI - DeepSeek</title>
+    <style>
+        :root {
+            --primary: #00ff88;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+        }
 
-  <script>
-    async function askAI() {
-      const prompt = document.getElementById('input').value;
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ prompt })
-      });
-      const data = await res.json();
-      document.getElementById('response').innerText = data.choices[0].message.content;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h1 { text-align: center; color: var(--primary); margin-bottom: 1.5rem; }
+
+        .chat-box {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            border-left: 4px solid var(--primary);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: #334155;
+            color: white;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            background: var(--primary);
+            color: #0f172a;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover { opacity: 0.8; transform: translateY(-2px); }
+        button:disabled { background: #64748b; cursor: not-allowed; }
+
+        .loading { font-style: italic; color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>NovaTech AI</h1>
+    <div id="response" class="chat-box">Halo! Saya AI bertenaga DeepSeek. Ada yang bisa saya bantu?</div>
+    
+    <div class="input-group">
+        <input type="text" id="userInput" placeholder="Ketik pertanyaan di sini..." onkeypress="handleKey(event)">
+        <button id="sendBtn" onclick="askAI()">Kirim</button>
+    </div>
+</div>
+
+<script>
+    function handleKey(e) {
+        if (e.key === 'Enter') askAI();
     }
-  </script>
+
+    async function askAI() {
+        const input = document.getElementById('userInput');
+        const output = document.getElementById('response');
+        const btn = document.getElementById('sendBtn');
+        
+        if (!input.value.trim()) return;
+
+        const question = input.value;
+        input.value = '';
+        output.innerHTML = '<span class="loading">DeepSeek sedang berpikir...</span>';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: question })
+            });
+
+            const data = await res.json();
+            
+            if (data.choices && data.choices[0]) {
+                output.innerText = data.choices[0].message.content;
+            } else {
+                output.innerText = "Error: " + (data.error || "Gagal mengambil jawaban.");
+            }
+        } catch (err) {
+            output.innerText = "Koneksi terputus. Pastikan API Key sudah benar di Vercel.";
+        } finally {
+            btn.disabled = false;
+        }
+    }
+</script>
+
 </body>
 </html>
