@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h1>AI Assistant</h1>
+  <input type="text" id="input" placeholder="Tanya sesuatu...">
+  <button onclick="askAI()">Kirim</button>
+  <p id="response"></p>
+
+  <script>
+    async function askAI() {
+      const prompt = document.getElementById('input').value;
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      document.getElementById('response').innerText = data.choices[0].message.content;
+    }
+  </script>
+</body>
+</html>
